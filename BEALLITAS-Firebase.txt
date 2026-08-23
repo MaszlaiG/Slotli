@@ -1,0 +1,216 @@
+======================================================================
+ SLOTLI — FIREBASE BEÁLLÍTÁS (Authentication + Firestore + Hosting)
+ Projekt: slotli-202608
+======================================================================
+
+MI EZ AZ APP?
+  A Slotli egy időpontfoglaló + számlázó. A tulaj bejelentkezik, és a
+  foglalásait/számláit kezeli a felhőben (Firestore: vaults/{uid}).
+  PLUSZ: generál egy BEÁGYAZHATÓ foglaló-widgetet idegen weboldalba.
+  A látogató foglal, a foglalás a Firestore-ba kerül, és ÉLŐBEN megjelenik
+  a Slotli-fiókodban. A foglalt idősávok is a felhőben vannak, így
+  KÉT ember nem foglalhatja ugyanazt (ütközésvédelem).
+
+  Három Firebase-szolgáltatás kell:
+    - Authentication → a tulaj bejelentkezése (e-mail/jelszó).
+    - Firestore     → a tulaj adata + a beérkező foglalások + a foglalt
+                      idősávok + a foglaló-konfig.
+    - Hosting       → a Slotli weboldal kiszolgálása (HTTPS-sel).
+
+
+----------------------------------------------------------------------
+0) ELŐFELTÉTELEK
+----------------------------------------------------------------------
+- Google-fiók, és a projekt már létrehozva: slotli-202608.
+- Firebase CLI a gépen (telepítése lentebb).
+
+
+----------------------------------------------------------------------
+1) FIREBASE CLI TELEPÍTÉSE + BEJELENTKEZÉS (egyszer, gépenként)
+----------------------------------------------------------------------
+    curl -sL https://firebase.tools | bash
+    firebase login
+  Ellenőrzés:  firebase projects:list   (látnod kell a slotli-202608-at)
+
+
+----------------------------------------------------------------------
+2) AUTHENTICATION (bejelentkezés) — a console-ban
+----------------------------------------------------------------------
+MIRE VALÓ: a TULAJ bejelentkezése. (A nyilvános foglaló-widgethez NEM kell
+bejelentkezés — azt a Firestore-szabály engedi bejelentkezés nélkül.)
+
+LÉPÉSEK:
+  Console → Build → Authentication → "Get started"
+    → "Sign-in method" → "Email/Password" → Enable → Save.
+
+
+----------------------------------------------------------------------
+3) FIRESTORE DATABASE (adattár) — a console-ban
+----------------------------------------------------------------------
+  Console → Build → Firestore Database → "Create database"
+    → Régió: europe-west (eur3)   [FIGYELEM: később NEM módosítható]
+    → Mód:   Production mode
+    → Create / Enable.
+
+
+----------------------------------------------------------------------
+4) A DEPLOY-FÁJLOK (már a mappában vannak)
+----------------------------------------------------------------------
+  firebase.json          → Hosting + Firestore beállítás.
+  .firebaserc            → a projekt: slotli-202608.
+  firestore.rules        → biztonsági szabályok (ld. 5. pont).
+  firestore.indexes.json → (üres) index-fájl.
+
+
+----------------------------------------------------------------------
+5) FIRESTORE SZABÁLYOK — MAGYARÁZAT (firestore.rules)
+----------------------------------------------------------------------
+Négy rész:
+
+  a) A tulaj privát adata:
+       match /vaults/{uid} {
+         allow read, write: if request.auth != null && request.auth.uid == uid;
+       }
+
+  b) Nyilvános foglaló-konfiguráció (a widget ebből tölti a szolgáltatásokat/
+     nyitvatartást):
+       match /booking_configs/{uid} {
+         allow read: if true;                          // bárki OLVASHATJA
+         allow write: if request.auth != null && request.auth.uid == uid;
+       }
+
+  c) Foglalt idősávok (ütközésvédelem — a dokumentum azonosítója maga a
+     sáv, és csak akkor hozható létre, ha még nem létezik):
+       match /busy/{uid}/slots/{slotKey} {
+         allow read: if true;                          // a widget látja, mi foglalt
+         allow create: if !exists(.../slots/$(slotKey));  // csak ha még szabad
+         allow update, delete: if request.auth != null && request.auth.uid == uid;
+       }
+     → két egyidejű foglalás ugyanarra a sávra: az első létrehozza, a
+       második "már létezik" miatt elbukik. Így nincs dupla foglalás.
+
+  d) Beérkező foglalások inboxa:
+       match /inbox/{uid}/items/{docId} {
+         allow create: if request.resource.data.size() < 40;   // bárki LÉTREHOZHAT
+         allow read, delete: if request.auth != null && request.auth.uid == uid;
+       }
+
+A "firebase deploy" a szabályt automatikusan felteszi.
+
+
+----------------------------------------------------------------------
+6) DEPLOY (feltöltés)
+----------------------------------------------------------------------
+A Slotli mappájában:
+
+    cd "<a Slotli mappa útvonala>"
+    firebase deploy
+
+  Felteszi a HOSTINGOT + a FIRESTORE-SZABÁLYT.
+  URL:  https://slotli-202608.web.app
+  Minden módosítás után futtasd újra. (--only hosting / --only firestore:rules)
+
+
+----------------------------------------------------------------------
+7) DEPLOY UTÁN — FONTOS (a beágyazott widgethez)
+----------------------------------------------------------------------
+1. Nyisd meg az élő Slotlit (slotli-202608.web.app) → REGISZTRÁLJ /
+   jelentkezz be → a "Foglaló / weboldal" fülön állítsd be a
+   szolgáltatásokat, nyitvatartást, sávhosszt és MENTS. Ekkor kerül fel a
+   foglaló-konfig a Firestore-ba (booking_configs), hogy a widget lássa.
+2. Másold ki a "Foglaló" fülön a GENERÁLT beágyazó kódot, és tedd az
+   idegen weboldalba. (A foglalás a Firestore inboxba kerül, a foglalt
+   sávok a busy-ba — a "Foglalások" fülön élőben látod.)
+3. Tesztelés: foglalj egy próbaidőpontot → nézd meg a Foglalásoknál, és
+   próbáld ugyanazt a sávot mégegyszer → "épp lefoglalták" üzenetet kell
+   kapnod (ütközésvédelem).
+
+
+----------------------------------------------------------------------
+8) (OPCIONÁLIS) EGYEDI DOMAIN
+----------------------------------------------------------------------
+Console → Build → Hosting → "Add custom domain" (pl. slotli.hu) → DNS.
+Utána: Authentication → Settings → Authorized domains közé is felvenni.
+
+
+----------------------------------------------------------------------
+9) (AJÁNLOTT) APP CHECK — bot-védelem a nyilvános íráshoz
+----------------------------------------------------------------------
+A foglaló-widget NYILVÁNOSAN ír (inbox + foglalt sávok), ezért botok
+spammelhetik / lefoglalhatják a sávokat. Ez ellen az App Check (reCAPTCHA
+v3) véd.
+FIGYELEM: a reCAPTCHA domain-hez kötött — a widgetet csak a felvett
+domaineken engedi. Ha "bárhová" ágyazod, ez korlátozó; amíg kevés, ismert
+oldalra teszed, praktikus.
+  Console → Build → App Check → a Web app → Register → reCAPTCHA v3
+  → a site key a kódba, a secret a Firebase-be. Először "Unenforced"!
+
+
+----------------------------------------------------------------------
+10) BIZTONSÁG DIÓHÉJBAN
+----------------------------------------------------------------------
+- HTTPS: automatikus (Hosting).
+- Auth + Rules: a tulaj adata uid-re zárva; a nyilvános írás csak "create"
+  + méretkorlát; a foglalt sávok ütközésvédve.
+- apiKey: publikus azonosító, nem titok.
+- A widget honeypot mezője + a méretkorlát alap bot-védelmet ad; App Check
+  tovább erősíti (9. pont).
+
+
+======================================================================
+ GYORS CHECKLIST
+======================================================================
+[ ] 1. Firebase CLI + firebase login
+[ ] 2. Authentication → Email/Password: Enabled
+[ ] 3. Firestore Database létrehozva (europe-west, Production)
+[ ] 6. firebase deploy → slotli-202608.web.app él
+[ ] 7. Bejelentkezés + Foglaló beállítása/mentése (konfig felkerül) + kód
+[ ] 7. Próbafoglalás → megjelenik a Foglalásoknál; ütközés-teszt OK
+[ ] 8/9. (Opcionális) egyedi domain / App Check
+======================================================================
+
+======================================================================
+  JELSZÓ-VISSZAÁLLÍTÓ E-MAIL TESTRESZABÁSA (Slotli márka)
+======================================================================
+  Az "Elfelejtett jelszó?" gomb a Firebase saját visszaállító levelét
+  küldi (nem az EmailJS-t). Ennek szövege/feladóneve testre szabható a
+  konzolban. FONTOS: a Firebase kerete/HTML-je fix — csak a feladónév,
+  tárgy, szöveg és a válasz-cím módosítható.
+
+HOL:
+  Firebase Console -> Authentication -> Templates (Sablonok)
+  -> "Password reset" (Jelszó-visszaállítás) -> ceruza (szerkesztés).
+  Nyelv: állítsd Magyarra, hogy a lenti szöveg jelenjen meg.
+
+MÁSOLD BE:
+
+  Feladó neve (Sender name):
+      Slotli
+
+  Tárgy (Subject):
+      Jelszó visszaállítása – Slotli
+
+  Üzenet (Message):
+      Szia!
+
+      Jelszó-visszaállítási kérés érkezett a Slotli-fiókodhoz (%EMAIL%).
+      Állítsd be az új jelszavad az alábbi linken:
+
+      %LINK%
+
+      Ha nem te kérted, hagyd figyelmen kívül ezt a levelet — a
+      jelszavad változatlan marad.
+
+      Üdv,
+      a Slotli
+
+  Válasz-cím (Reply-to): a saját e-mail címed (nem kötelező).
+
+MEGJEGYZÉS:
+  - A %LINK% kötelező (ez a visszaállító hivatkozás). A %EMAIL% a címzett
+    e-mailjét szúrja be.
+  - A feladó címe alapból: noreply@<projekt>.firebaseapp.com. Saját
+    domainű feladóhoz külön SMTP/domain-hitelesítés kell (haladó, opcionális).
+  - Teljes HTML-brandinget (mint az EmailJS-leveleknél) a Firebase itt
+    nem enged — csak a fenti mezők állíthatók.
+======================================================================

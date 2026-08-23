@@ -1,0 +1,102 @@
+======================================================================
+  SLOTLI — E-MAIL RENDSZER (EmailJS) BEÁLLÍTÁSA
+======================================================================
+
+MI EZ?
+  Amikor valaki a weboldaladra ágyazott időpontfoglalón lefoglal egy
+  időpontot, a Slotli KÉT visszaigazoló e-mailt küld az EmailJS
+  szolgáltatáson keresztül:
+    1) a FOGLALÓNAK  -> "Köszönjük a foglalásod!" (email-sablon.html)
+    2) NEKED (tulaj) -> "Új foglalás érkezett"    (email-sablon-tulaj.html)
+  Az e-mail közvetlenül a látogató böngészőjéből megy ki (nincs backend).
+
+ELŐFELTÉTEL
+  - EmailJS fiók (ingyenes csomag is elég a kezdéshez): https://www.emailjs.com
+  - Egy e-mail fiók, amiről a levelek mennek (pl. Gmail).
+
+----------------------------------------------------------------------
+LÉPÉSEK
+----------------------------------------------------------------------
+
+1) FIÓK
+   Regisztrálj / lépj be: https://dashboard.emailjs.com
+
+2) EMAIL SERVICE (a küldő fiók)
+   Email Services -> Add New Service -> válaszd ki a szolgáltatód
+   (pl. Gmail), és kösd össze a fiókod.
+   -> Kimásolod: SERVICE ID   (pl. service_xxxxxxx)
+
+3) KÉT EMAIL TEMPLATE
+   Email Templates -> Create New Template. Készíts KETTŐT:
+
+   a) FOGLALÓ-VISSZAIGAZOLÁS
+      - Content -> "</>" (Code / HTML editor) -> illeszd be a
+        email-sablon.html teljes tartalmát.
+      - Settings fül:
+          To Email   : {{to_email}}
+          From Name  : {{from_name}}
+          Reply To   : {{reply_to}}
+          Subject    : {{subject}}
+      -> Kimásolod: TEMPLATE ID (ez lesz a templateCustomer)
+
+   b) TULAJ-ÉRTESÍTŐ
+      - Code editor -> illeszd be a email-sablon-tulaj.html tartalmát.
+      - Settings fül: ugyanaz, mint fent (To/From/Reply/Subject).
+      -> Kimásolod: TEMPLATE ID (ez lesz a templateOwner)
+
+   A sablonok által használt változók (a kód tölti ki őket):
+      {{from_name}} {{brand_initial}} {{tagline}} {{heading}} {{intro}}
+      {{{details}}}  <- FONTOS: HÁROM kapcsos zárójel (nyers HTML-tábla)!
+      A tulaj-sablon még ezeket is használja a gyors-gombokhoz:
+      {{action_tel}} {{action_mail}}  (üresnél a gomb magától eltűnik)
+
+4) PUBLIC KEY
+   Account -> General (vagy API Keys) -> másold ki a PUBLIC KEY-t.
+
+5) A 4 AZONOSÍTÓ BEÍRÁSA A KÓDBA
+   Nyisd meg: script.js, a fájl tetején (kb. a 841. sor):
+
+     const EMAILJS_CFG = {
+       publicKey:        "IDE_A_PUBLIC_KEY",
+       serviceId:        "IDE_A_SERVICE_ID",
+       templateCustomer: "IDE_A_FOGLALO_TEMPLATE_ID",
+       templateOwner:    "IDE_A_TULAJ_TEMPLATE_ID"
+     };
+
+   Ezek publikus azonosítók (nem titkosak) — az EmailJS böngészős
+   használatában mindegyik látható, ez normális.
+
+6) KÖZZÉTÉTEL
+   firebase deploy   (ld. BEALLITAS-Firebase.txt)
+
+7) TESZT
+   Nyisd meg az élő oldaladat, a beágyazott foglalón foglalj egy
+   próba-időpontot, és nézd meg, megjön-e mindkét levél (a tulaj-levél
+   a bejelentkezett fiókod e-mail címére megy).
+
+----------------------------------------------------------------------
+HIBAELHÁRÍTÁS
+----------------------------------------------------------------------
+  - Nyers <tr>...</tr> szöveg látszik a levélben:
+      a template-ben {{details}} helyett {{{details}}} kell (3 kapcsos).
+  - Nem jön levél:
+      * ellenőrizd a 4 azonosítót (elgépelés?),
+      * a Service tényleg össze van kötve a fiókkal,
+      * nézd meg a SPAM mappát,
+      * EmailJS Dashboard -> Email History: mi a hiba,
+      * ingyenes csomagnál van havi küldési limit.
+  - A tulaj-levél nem jön, de a foglalóé igen:
+      a tulaj e-mail címe a profilodból (Fiók) jön — legyen kitöltve.
+
+======================================================================
+  ELLENŐRZŐLISTA
+======================================================================
+[ ] 1. EmailJS fiók
+[ ] 2. Email Service összekötve  -> serviceId
+[ ] 3a. Foglaló-template (email-sablon.html)      -> templateCustomer
+[ ] 3b. Tulaj-template   (email-sablon-tulaj.html) -> templateOwner
+[ ] 4. Public Key
+[ ] 5. EMAILJS_CFG kitöltve a script.js-ben
+[ ] 6. firebase deploy
+[ ] 7. Próba-foglalás -> 2 levél megérkezik
+======================================================================

@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // A tulaj privát adata — bejelentkezés kötelező, csak a saját uid.
+    match /vaults/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Nyilvános foglaló-konfiguráció: a beágyazott widget OLVASSA
+    // (szolgáltatások, nyitvatartás — nem érzékeny); csak a tulaj írhatja.
+    match /booking_configs/{uid} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Foglalt idősávok: bárki olvashatja; a widget új sávot LÉTREHOZHAT
+    // (a doc-ID maga a sáv → ütközésvédelem); csak a tulaj módosít/töröl.
+    // (A widget bekötése a "B rész".)
+    match /busy/{uid}/slots/{slotKey} {
+      allow read: if true;
+      allow create: if !exists(/databases/$(database)/documents/busy/$(uid)/slots/$(slotKey));
+      allow update, delete: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Beérkező foglalások inboxa: a nyilvános widget LÉTREHOZHAT (méretkorlát),
+    // csak a tulaj olvashatja/törölheti.
+    match /inbox/{uid}/items/{docId} {
+      allow create: if request.resource.data.size() < 40;
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}

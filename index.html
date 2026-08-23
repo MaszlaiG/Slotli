@@ -1,0 +1,947 @@
+<!doctype html>
+<html lang="hu" data-theme="kompakt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Slotli</title>
+    <link rel="icon" type="image/svg+xml" href="icon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("slotli_theme");
+          if (["kompakt"].indexOf(t) === -1) t = "kompakt";
+          var m = localStorage.getItem("slotli_mode");
+          if (m !== "light" && m !== "dark" && m !== "auto") m = "auto";
+          var mode =
+            m === "light" || m === "dark"
+              ? m
+              : new Date().getHours() >= 19 || new Date().getHours() < 6
+                ? "dark"
+                : "light";
+          var r = document.documentElement;
+          r.setAttribute("data-theme", t);
+          r.setAttribute("data-mode", mode);
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "kompakt");
+          document.documentElement.setAttribute("data-mode", "light");
+        }
+      })();
+    </script>
+    <link rel="stylesheet" href="css/style.css?v=20260808" />
+  </head>
+  <body>
+    <div
+      id="auth-gate"
+      style="
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        background: var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      "
+    >
+      <div
+        id="auth-card"
+        style="
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 28px;
+          max-width: 360px;
+          width: 100%;
+          box-shadow: 0 18px 50px rgba(20, 30, 55, 0.18);
+        "
+      >
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px">
+          <img src="icon.svg" width="38" height="38" alt="" />
+          <span style="font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: -0.01em"
+            >Slotli</span
+          >
+        </div>
+        <div id="auth-subtitle" style="color: var(--muted); font-size: 13px; margin-bottom: 18px">
+          Jelentkezz be az időpontfoglalásaid kezeléséhez.
+        </div>
+
+        <div class="form-field" style="margin-bottom: 12px">
+          <label for="auth-email">E-mail</label>
+          <input type="email" id="auth-email" autocomplete="email" placeholder="te@pelda.hu" />
+        </div>
+        <div class="form-field" style="margin-bottom: 12px">
+          <label for="auth-password">Jelszó</label>
+          <input type="password" id="auth-password" autocomplete="current-password" placeholder="********" />
+        </div>
+        <div class="form-field" id="auth-confirm-wrap" style="margin-bottom: 12px; display: none">
+          <label for="auth-password2">Jelszó újra</label>
+          <input type="password" id="auth-password2" autocomplete="new-password" placeholder="********" />
+        </div>
+
+        <div
+          id="auth-error"
+          style="
+            display: none;
+            background: var(--c-red-bg);
+            color: var(--c-red-fg);
+            border-radius: 8px;
+            padding: 9px 11px;
+            font-size: 12.5px;
+            margin-bottom: 12px;
+          "
+        ></div>
+        <div
+          id="auth-info"
+          style="
+            display: none;
+            background: var(--c-green-bg);
+            color: var(--c-green-fg);
+            border-radius: 8px;
+            padding: 9px 11px;
+            font-size: 12.5px;
+            margin-bottom: 12px;
+          "
+        ></div>
+
+        <button id="auth-login-btn" class="btn" style="width: 100%; justify-content: center" onclick="authLogin()">
+          Belépés
+        </button>
+
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 14px;
+            font-size: 12.5px;
+          "
+        >
+          <a
+            href="#"
+            id="auth-forgot"
+            onclick="authResetPassword();return false"
+            style="color: var(--muted); text-decoration: none"
+            >Elfelejtett jelszó?</a
+          >
+          <a
+            href="#"
+            id="auth-toggle"
+            onclick="setAuthMode(_authMode==='login'?'register':'login');return false"
+            style="color: var(--primary); text-decoration: none; font-weight: 600"
+            >Regisztrálj</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div id="app-root" style="display: none">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-head">
+          <div class="brand-lockup">
+            <span class="brand-tile">
+              <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="sl-g" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="var(--brand-1)" />
+                    <stop offset="1" stop-color="var(--brand-2)" />
+                  </linearGradient>
+                </defs>
+                <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#sl-g)" />
+                <rect x="14" y="16" width="36" height="34" rx="5" fill="#ffffff" />
+                <rect x="22" y="12" width="4" height="8" rx="2" fill="#ffffff" />
+                <rect x="38" y="12" width="4" height="8" rx="2" fill="#ffffff" />
+                <rect x="20" y="31" width="24" height="5" rx="2.5" fill="var(--brand-accent)" />
+                <rect x="20" y="40" width="15" height="5" rx="2.5" fill="var(--brand-1)" opacity="0.30" />
+              </svg>
+            </span>
+            <span class="brand-word">Slot<span>li</span></span>
+          </div>
+          <button
+            class="sidebar-collapse"
+            onclick="toggleSidebarCollapse()"
+            title="Menü ki- / összecsukása"
+            aria-label="Menü ki- / összecsukása"
+          >
+            <span class="chev">&laquo;</span>
+          </button>
+        </div>
+
+        <nav id="main-nav">
+          <button class="active" data-tab="dash" onclick="showTab('dash')" title="Áttekintés">
+            <span class="nav-ico"
+              ><svg viewBox="0 0 24 24">
+                <path d="M3 13h8V3H3zM13 21h8V3h-8zM3 21h8v-6H3z" stroke-linejoin="round" /></svg
+            ></span>
+            <span class="nav-label">Áttekintés</span>
+          </button>
+          <button data-tab="bookings" onclick="showTab('bookings')" title="Foglalások">
+            <span class="nav-ico"
+              ><svg viewBox="0 0 24 24">
+                <path
+                  d="M12 7v5l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                /></svg
+            ></span>
+            <span class="nav-label">Foglalások</span>
+          </button>
+          <button data-tab="clients" onclick="showTab('clients')" title="Ügyfelek">
+            <span class="nav-ico"
+              ><svg viewBox="0 0 24 24">
+                <path
+                  d="M16 19v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 17.5V19M10 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6M20 19v-1.5a3.5 3.5 0 0 0-2.6-3.38M15.5 5.2a3 3 0 0 1 0 5.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                /></svg
+            ></span>
+            <span class="nav-label">Ügyfelek</span>
+          </button>
+          <button data-tab="invoices" onclick="showTab('invoices')" title="Számlák">
+            <span class="nav-ico"
+              ><svg viewBox="0 0 24 24">
+                <path
+                  d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                /></svg
+            ></span>
+            <span class="nav-label">Számlák</span>
+          </button>
+          <button data-tab="booker" onclick="showTab('booker')" title="Foglaló / weboldal">
+            <span class="nav-ico"
+              ><svg viewBox="0 0 24 24">
+                <path d="M5 4h14v16H5zM5 9h14M9 13h6M9 16h4" stroke-linecap="round" stroke-linejoin="round" /></svg
+            ></span>
+            <span class="nav-label">Foglaló</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-foot">
+          <button
+            class="side-account"
+            id="side-account-btn"
+            onclick="showTab('account')"
+            title="Fiók, vállalkozás és megjelenés"
+          >
+            <span class="side-avatar" id="side-avatar">S</span>
+            <span class="side-account-meta">
+              <span class="side-account-name" id="side-account-name">Fiók</span>
+              <span class="side-account-sub" id="side-account-sub">Beállítások</span>
+            </span>
+          </button>
+        </div>
+      </aside>
+
+      <div class="sidebar-overlay" onclick="closeNav()" aria-hidden="true"></div>
+
+      <div class="content-area">
+        <header class="topbar">
+          <button class="topbar-burger" onclick="toggleNav()" aria-label="Menü megnyitása">&#9776;</button>
+          <div class="topbar-title" id="nav-current-label">Áttekintés</div>
+          <div class="topbar-actions">
+            <span id="sync-status" class="sync-pill">Betöltés…</span>
+            <div class="header-meta" id="header-date"></div>
+          </div>
+        </header>
+
+        <main>
+          <div class="tab-content active" id="tab-dash">
+            <div
+              class="grid"
+              id="dash-stats"
+              style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 18px"
+            ></div>
+            <div
+              class="grid"
+              style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; align-items: start"
+            >
+              <div class="card">
+                <div class="card-title">Mai nap</div>
+                <div id="dash-today"></div>
+              </div>
+              <div class="card">
+                <div class="card-title">Közelgő foglalások</div>
+                <div id="dash-upcoming"></div>
+              </div>
+            </div>
+            <div class="card" style="margin-top: 18px">
+              <div class="card-title">Bevétel — utolsó 12 hónap</div>
+              <div id="dash-revenue"></div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="tab-bookings">
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px">
+              <button class="btn" onclick="openBookingModal()">+ Foglalás</button>
+              <button class="btn btn-secondary btn-sm" onclick="refreshInbox()">&#8635; Frissítés</button>
+              <span class="badge badge-red" id="bookings-new-count" style="display: none"></span>
+              <div style="flex: 1"></div>
+              <select
+                id="bookings-filter"
+                class="status-select s-gray"
+                onchange="renderBookingsTable()"
+                style="max-width: 180px"
+              >
+                <option value="upcoming">Közelgő + mai</option>
+                <option value="all">Összes</option>
+                <option value="past">Korábbi</option>
+              </select>
+            </div>
+            <div
+              id="bookings-sync-error"
+              style="
+                display: none;
+                background: var(--alert-bg);
+                border: 1px solid var(--alert-border);
+                color: var(--alert-fg);
+                border-radius: 8px;
+                padding: 9px 12px;
+                font-size: 12.5px;
+                margin-bottom: 12px;
+              "
+            ></div>
+            <div class="card" style="padding: 0; overflow: hidden">
+              <div style="overflow-x: auto">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th style="min-width: 140px">Időpont</th>
+                      <th>Ügyfél</th>
+                      <th>Szolgáltatás</th>
+                      <th>Üzenet</th>
+                      <th style="min-width: 150px">Státusz</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bookings-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="tab-clients">
+            <div class="account-sub" style="max-width: 760px; margin-bottom: 14px">
+              Az ügyfelek automatikusan a beérkező foglalásokból állnak össze (e-mail alapján). Itt látod, ki hányszor
+              foglalt, és mikor jön legközelebb.
+            </div>
+            <div id="clients-wrap"></div>
+          </div>
+
+          <div class="tab-content" id="tab-booker">
+            <div class="account-sub" style="max-width: 840px; margin-bottom: 16px">
+              Állítsd be a foglaló-felületed: szolgáltatások időtartammal és árral, nyitvatartás, sávhossz. Alul a
+              beállításaid alapján frissül a beillesztendő kód — másold a weboldaladra. A látogató csak a
+              <strong>szabad</strong> idősávokból választhat, és a foglalás azonnal lefoglalja a sávot.
+            </div>
+
+            <div
+              class="grid"
+              style="grid-template-columns: minmax(0, 1fr) minmax(0, 360px); gap: 20px; align-items: start"
+            >
+              <div>
+                <div class="card" style="margin-bottom: 16px">
+                  <div class="card-title">Szolgáltatások (időtartam + ár)</div>
+                  <div id="bk-services"></div>
+                  <button class="btn btn-secondary btn-sm" onclick="addService()" style="margin-top: 6px">
+                    + Szolgáltatás
+                  </button>
+                  <div class="account-sub" style="margin-top: 10px">
+                    Add meg a magyar és (ha szeretnéd) az angol nevet, az <strong>időtartamot percben</strong>, és az
+                    árat Ft-ban / €-ban. Az időtartam határozza meg, hány idősávot foglal egy szolgáltatás.
+                  </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 16px">
+                  <div class="card-title">Nyitvatartás</div>
+                  <div id="bk-hours"></div>
+                  <div class="account-sub" style="margin-top: 10px">
+                    Naponta megadhatod a nyitvatartást. Zárt napon vedd ki a pipát. A widget ezen belül, a sávhossz
+                    szerint kínálja fel az időpontokat.
+                  </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 16px">
+                  <div class="card-title">Idősávok</div>
+                  <div class="form-grid fg2">
+                    <div class="form-field">
+                      <label for="bk-slotmin">Sávhossz (perc)</label>
+                      <select id="bk-slotmin" onchange="updateBookerOutputs()">
+                        <option value="15">15 perc</option>
+                        <option value="20">20 perc</option>
+                        <option value="30">30 perc</option>
+                        <option value="60">60 perc</option>
+                      </select>
+                    </div>
+                    <div class="form-field">
+                      <label for="bk-horizon">Foglalható előre (nap)</label>
+                      <input
+                        type="number"
+                        id="bk-horizon"
+                        min="1"
+                        max="120"
+                        value="21"
+                        onchange="updateBookerOutputs()"
+                      />
+                    </div>
+                    <div class="form-field">
+                      <label for="bk-minnotice">Legkorábbi foglalás (óra múlva)</label>
+                      <input
+                        type="number"
+                        id="bk-minnotice"
+                        min="0"
+                        max="168"
+                        value="2"
+                        onchange="updateBookerOutputs()"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 16px">
+                  <div class="card-title">Megjelenő mezők</div>
+                  <label class="fc-check"
+                    ><input type="checkbox" id="bk-showprices" onchange="updateBookerOutputs()" /> Árak megjelenítése a
+                    szolgáltatásoknál</label
+                  >
+                  <label class="fc-check"
+                    ><input type="checkbox" id="bk-field-phone" onchange="updateBookerOutputs()" /> Telefon mező</label
+                  >
+                  <label class="fc-check"
+                    ><input type="checkbox" id="bk-field-message" onchange="updateBookerOutputs()" /> Üzenet mező</label
+                  >
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+                  <button class="btn" onclick="saveBookingConfig()">Beállítások mentése</button>
+                  <span class="mode-note" id="bk-save-note"></span>
+                </div>
+              </div>
+
+              <div class="card" style="position: sticky; top: 78px">
+                <div class="card-title">Élő előnézet</div>
+                <div id="bk-preview" class="fc-preview"></div>
+                <div class="account-sub" style="margin-top: 10px">
+                  Így fog kinézni a foglaló (a te weboldalad stílusát veszi majd fel). Kipróbálható, de innen nem küld.
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="margin-top: 16px">
+              <div class="card-title">Beillesztendő kód (HTML + JavaScript) — elég egyszer</div>
+              <div class="form-grid fg2" style="margin-bottom: 12px">
+                <div class="form-field">
+                  <label for="bk-uid">Fiókazonosító (a kódban: OWNER_UID)</label>
+                  <input
+                    type="text"
+                    id="bk-uid"
+                    readonly
+                    onclick="this.select()"
+                    style="font-family: var(--mono); font-size: 12px"
+                  />
+                </div>
+              </div>
+              <textarea
+                id="bk-snippet"
+                readonly
+                rows="16"
+                onclick="this.select()"
+                style="
+                  width: 100%;
+                  font-family: var(--mono);
+                  font-size: 11.5px;
+                  line-height: 1.5;
+                  white-space: pre;
+                  overflow: auto;
+                "
+              ></textarea>
+              <div style="margin-top: 12px">
+                <button class="btn btn-sm" onclick="copyBookerSnippet()">Kód másolása</button>
+              </div>
+              <div class="account-sub" style="margin-top: 10px">
+                Ezt a kódot <strong>elég egyetlen egyszer</strong> beilleszteni a weboldaladba. Ha itt módosítasz és
+                mentesz, a foglaló magától frissül — nem kell újramásolni. A beérkező foglalás a „Foglalások" fülön
+                jelenik meg. Bármilyen oldalon működik (sima HTML, WordPress „Egyéni HTML" blokk, stb.).
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="tab-invoices">
+            <div class="grid g4" style="margin-bottom: 16px">
+              <div class="card card-stat-purple">
+                <div class="card-title">Összes számla</div>
+                <div class="stat-value purple" id="inv-total-count">0 db</div>
+                <div class="stat-sub" id="inv-total-sum">0 Ft</div>
+              </div>
+              <div class="card card-stat-green">
+                <div class="card-title">Kifizetett</div>
+                <div class="stat-value green" id="inv-paid-count">0 db</div>
+                <div class="stat-sub" id="inv-paid-sum">0 Ft</div>
+              </div>
+              <div class="card card-stat-yellow">
+                <div class="card-title">Függőben</div>
+                <div class="stat-value yellow" id="inv-unpaid-count">0 db</div>
+                <div class="stat-sub" id="inv-unpaid-sum">0 Ft kintlévőség</div>
+              </div>
+              <div class="card card-stat-red">
+                <div class="card-title">Lejárt</div>
+                <div class="stat-value red" id="inv-overdue-count">0 db</div>
+                <div class="stat-sub" id="inv-overdue-sum">0 Ft</div>
+              </div>
+            </div>
+
+            <div class="grid g21" style="align-items: stretch; margin-bottom: 16px">
+              <div class="card">
+                <div class="card-title">Függőben lévő számlák</div>
+                <div class="scroll-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Számlaszám</th>
+                        <th>Kiállítva</th>
+                        <th>Vevő</th>
+                        <th>Foglalás</th>
+                        <th>Összeg</th>
+                        <th>Állapot</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="invoices-unpaid-tbody">
+                      <tr>
+                        <td colspan="7" style="color: var(--muted); text-align: center; padding: 24px">
+                          Nincs függőben lévő számla.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="card" style="height: 100%; box-sizing: border-box">
+                <div class="card-title" style="color: var(--accent)">Számlázható foglalások</div>
+                <div style="font-size: 11.5px; color: var(--muted); margin-bottom: 14px">
+                  Kattints a „+ Számla" gombra a kiállításhoz
+                </div>
+                <div id="inv-bookings-list">
+                  <div style="color: var(--muted); font-size: 12.5px">Betöltés…</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">Számlák</div>
+              <div class="scroll-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Számlaszám</th>
+                      <th>Kiállítva</th>
+                      <th>Vevő</th>
+                      <th>Foglalás</th>
+                      <th>Összeg</th>
+                      <th>Állapot</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="invoices-paid-tbody">
+                    <tr>
+                      <td colspan="7" style="color: var(--muted); text-align: center; padding: 24px">
+                        Még nincs kifizetett számla.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content account-page" id="tab-account">
+            <div class="card appearance-section" style="margin-bottom: 16px">
+              <div class="appearance-label">Profil</div>
+              <div class="form-grid fg2">
+                <div class="form-field">
+                  <label for="acct-name">Vállalkozás / neved</label>
+                  <input type="text" id="acct-name" placeholder="pl. Kovács Fodrászat" autocomplete="name" />
+                </div>
+                <div class="form-field">
+                  <label for="acct-email-input">E-mail cím</label>
+                  <input type="email" id="acct-email-input" autocomplete="email" />
+                  <div class="account-sub">A bejelentkezéshez tartozik — módosítható.</div>
+                </div>
+              </div>
+              <div style="margin-top: 12px">
+                <button class="btn btn-sm" onclick="saveAccountProfile()">Profil mentése</button>
+                <span class="mode-note" id="acct-profile-note" style="margin-left: 10px"></span>
+              </div>
+            </div>
+
+            <div class="card appearance-section" style="margin-bottom: 16px">
+              <div class="appearance-label">Jelszó módosítása</div>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="acct-pw0">Jelenlegi jelszó</label>
+                  <input type="password" id="acct-pw0" placeholder="••••••••" autocomplete="current-password" />
+                </div>
+                <div class="form-field">
+                  <label for="acct-pw1">Új jelszó</label>
+                  <input type="password" id="acct-pw1" placeholder="min. 6 karakter" autocomplete="new-password" />
+                </div>
+                <div class="form-field">
+                  <label for="acct-pw2">Új jelszó megerősítése</label>
+                  <input type="password" id="acct-pw2" placeholder="min. 6 karakter" autocomplete="new-password" />
+                </div>
+              </div>
+              <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap">
+                <button class="btn btn-sm" onclick="changeAccountPassword()">Jelszó módosítása</button>
+                <button class="btn btn-secondary btn-sm" onclick="sendAccountPasswordReset()">
+                  Visszaállító e-mail küldése
+                </button>
+              </div>
+              <div class="mode-note" id="acct-pw-note"></div>
+            </div>
+
+            <div class="card appearance-section" style="margin-bottom: 16px">
+              <div class="appearance-label">Vállalkozási forma és adózás</div>
+              <div class="form-grid fg2">
+                <div class="form-field">
+                  <label for="acct-bizform">Vállalkozási forma</label>
+                  <select id="acct-bizform" onchange="onBizFormChange()">
+                    <option value="">Nincs megadva</option>
+                    <option value="ev">Egyéni vállalkozó</option>
+                    <option value="ec">Egyéni cég (EC)</option>
+                    <option value="bt">Betéti társaság (Bt.)</option>
+                    <option value="kkt">Közkereseti társaság (Kkt.)</option>
+                    <option value="kft">Korlátolt felelősségű társaság (Kft.)</option>
+                    <option value="zrt">Zártkörű részvénytársaság (Zrt.)</option>
+                    <option value="nyrt">Nyilvános részvénytársaság (Nyrt.)</option>
+                    <option value="szov">Szövetkezet</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="acct-taxform">Adózási mód</label>
+                  <select id="acct-taxform"></select>
+                </div>
+              </div>
+              <div class="mode-note" id="acct-tax-note"></div>
+              <div style="margin-top: 12px">
+                <button class="btn btn-sm" onclick="saveBusinessProfile()">Vállalkozási adatok mentése</button>
+                <span class="mode-note" id="acct-biz-note" style="margin-left: 10px"></span>
+              </div>
+            </div>
+
+            <div class="card appearance-section" style="margin-bottom: 16px">
+              <div class="appearance-label">Cég adatai (számlázás)</div>
+              <div class="account-sub" style="margin: -4px 0 10px">
+                Ezek automatikusan bekerülnek minden új számla „Kiállító" mezőibe — nem kell újra beírni.
+              </div>
+              <div class="form-grid fg2">
+                <div class="form-field">
+                  <label for="seller-name">Cég / név</label>
+                  <input
+                    type="text"
+                    id="seller-name"
+                    placeholder="pl. Slotli Kft. / Kovács Gábor e.v."
+                    autocomplete="organization"
+                  />
+                </div>
+                <div class="form-field">
+                  <label for="seller-tax">Adószám</label>
+                  <input type="text" id="seller-tax" placeholder="pl. 12345678-1-42" />
+                </div>
+                <div class="form-field" style="grid-column: 1 / -1">
+                  <label for="seller-address">Cím (székhely)</label>
+                  <input type="text" id="seller-address" placeholder="pl. 4025 Debrecen, Piac utca 1." />
+                </div>
+                <div class="form-field">
+                  <label for="seller-reg">Cégjegyzék- / nyilvántartási szám</label>
+                  <input type="text" id="seller-reg" placeholder="pl. 09-09-123456 vagy EV-nyilv. szám" />
+                </div>
+                <div class="form-field">
+                  <label for="seller-bank">Bankszámlaszám</label>
+                  <input type="text" id="seller-bank" placeholder="pl. 12345678-12345678-12345678" />
+                </div>
+                <div class="form-field">
+                  <label for="seller-email">E-mail (számlához)</label>
+                  <input type="email" id="seller-email" placeholder="pl. szamla@slotli.hu" />
+                </div>
+                <div class="form-field">
+                  <label for="seller-phone">Telefon</label>
+                  <input type="text" id="seller-phone" placeholder="pl. +36 30 123 4567" />
+                </div>
+                <div class="form-field">
+                  <label for="seller-vat">ÁFA-státusz</label>
+                  <select id="seller-vat" onchange="onVatStatusChange()">
+                    <option value="alanyi">Alanyi adómentes (nem ÁFA-körös)</option>
+                    <option value="afas">ÁFA-körös (ÁFA-t számláz)</option>
+                  </select>
+                </div>
+                <div class="form-field" id="seller-vatrate-wrap" style="display: none">
+                  <label for="seller-vatrate">ÁFA-kulcs (%)</label>
+                  <input type="number" id="seller-vatrate" min="0" max="100" step="1" value="27" />
+                </div>
+              </div>
+              <div class="account-sub" style="margin-top: 8px">
+                Ez határozza meg, hogyan jelenik meg az ÁFA a számlán: alanyi adómentesnél „AAM" (áfa nélkül),
+                ÁFA-körösnél nettó + ÁFA + bruttó bontásban. A megadott árakat nettóként kezeli.
+              </div>
+              <div style="margin-top: 12px">
+                <button class="btn btn-sm" onclick="saveSellerInfo()">Cégadatok mentése</button>
+                <span class="mode-note" id="acct-seller-note" style="margin-left: 10px"></span>
+              </div>
+            </div>
+
+            <div class="card appearance-section" style="margin-bottom: 16px">
+              <div class="appearance-label">Megjelenés</div>
+              <p style="color: var(--muted); font-size: 12px; margin-bottom: 16px; line-height: 1.6">
+                Válaszd ki, mikor legyen világos vagy sötét a felület.
+              </p>
+              <div class="mode-seg" id="acct-mode-seg">
+                <button type="button" data-mode-pref="auto" onclick="setAppearanceMode('auto')">Automatikus</button>
+                <button type="button" data-mode-pref="light" onclick="setAppearanceMode('light')">Világos</button>
+                <button type="button" data-mode-pref="dark" onclick="setAppearanceMode('dark')">Sötét</button>
+              </div>
+              <div class="mode-note" id="acct-mode-note"></div>
+
+              <div class="appearance-label" style="margin-top: 18px">Nyelv / Language</div>
+              <div class="mode-seg" id="acct-lang-seg">
+                <button type="button" data-lang-pref="hu" onclick="setUiLang('hu')">Magyar</button>
+                <button type="button" data-lang-pref="en" onclick="setUiLang('en')">English</button>
+              </div>
+              <div class="mode-note" id="acct-lang-note"></div>
+            </div>
+
+            <div class="card" style="padding: 4px 20px">
+              <div class="account-row">
+                <div>
+                  <div class="account-email" id="acct-email">—</div>
+                  <div class="account-sub">Bejelentkezett fiók</div>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="authLogout()">Kijelentkezés</button>
+              </div>
+              <div class="account-row">
+                <div>
+                  <div class="account-email">Adatok mentése / visszatöltése</div>
+                  <div class="account-sub">Biztonsági mentés JSON-fájlba</div>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="openDataModal()">Megnyitás</button>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <div class="modal" id="booking-modal">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div class="card-title" style="margin: 0">Foglalás rögzítése</div>
+          <button class="btn btn-secondary btn-sm" onclick="closeModal('booking-modal')">✕</button>
+        </div>
+        <div class="form-grid fg2">
+          <div class="form-field"><label for="bm-name">Név *</label><input id="bm-name" type="text" /></div>
+          <div class="form-field"><label for="bm-email">E-mail</label><input id="bm-email" type="email" /></div>
+          <div class="form-field"><label for="bm-phone">Telefon</label><input id="bm-phone" type="text" /></div>
+          <div class="form-field">
+            <label for="bm-service">Szolgáltatás</label
+            ><input id="bm-service" type="text" list="bm-service-list" /><datalist id="bm-service-list"></datalist>
+          </div>
+          <div class="form-field"><label for="bm-date">Dátum *</label><input id="bm-date" type="date" /></div>
+          <div class="form-field"><label for="bm-time">Időpont *</label><input id="bm-time" type="time" /></div>
+        </div>
+        <div class="form-field" style="margin-top: 10px">
+          <label for="bm-message">Üzenet</label><textarea id="bm-message" rows="2"></textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px">
+          <button class="btn btn-secondary btn-sm" onclick="closeModal('booking-modal')">Mégse</button>
+          <button class="btn" onclick="addBooking()">Rögzítés</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="invoice-modal" onclick="if(event.target===this)closeModal('invoice-modal')">
+      <div class="modal-card" style="max-width: 640px">
+        <div class="modal-head">
+          <div class="section-title" style="font-size: 18px">Számla kiállítása</div>
+          <button class="btn btn-secondary btn-sm" onclick="closeModal('invoice-modal')">✕</button>
+        </div>
+        <input type="hidden" id="inv-booking-id" />
+
+        <div class="form-grid fg2" style="margin-bottom: 14px">
+          <div class="form-field">
+            <label for="inv-num">Számlaszám</label>
+            <input type="text" id="inv-num" placeholder="pl. sz_slotli/2026/0001_0001" />
+          </div>
+          <div></div>
+          <div class="form-field">
+            <label for="inv-issue-date">Kiállítás dátuma</label>
+            <input type="date" id="inv-issue-date" />
+          </div>
+          <div class="form-field">
+            <label for="inv-due-date">Fizetési határidő</label>
+            <input type="date" id="inv-due-date" />
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div
+          style="
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--muted);
+            margin: 10px 0 10px;
+          "
+        >
+          Kiállító (Eladó)
+        </div>
+        <div class="form-grid fg2" style="margin-bottom: 14px">
+          <div class="form-field">
+            <label for="inv-seller-name">Név / Cégnév</label>
+            <input type="text" id="inv-seller-name" placeholder="pl. Kiss János EV" />
+          </div>
+          <div class="form-field">
+            <label for="inv-seller-tax">Adószám</label>
+            <input type="text" id="inv-seller-tax" placeholder="pl. 12345678-1-42" />
+          </div>
+          <div class="form-field" style="grid-column: 1/-1">
+            <label for="inv-seller-address">Cím</label>
+            <input type="text" id="inv-seller-address" placeholder="pl. 4024 Debrecen, Piac utca 1." />
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div
+          style="
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--muted);
+            margin: 10px 0 10px;
+          "
+        >
+          Vevő
+        </div>
+        <div class="form-grid fg2" style="margin-bottom: 14px">
+          <div class="form-field">
+            <label for="inv-buyer-name">Név / Cégnév</label>
+            <input type="text" id="inv-buyer-name" placeholder="pl. Minta Anna" />
+          </div>
+          <div class="form-field">
+            <label for="inv-buyer-tax">Adószám (nem kötelező)</label>
+            <input type="text" id="inv-buyer-tax" placeholder="" />
+          </div>
+          <div class="form-field" style="grid-column: 1/-1">
+            <label for="inv-buyer-address">Cím</label>
+            <input type="text" id="inv-buyer-address" placeholder="pl. 1051 Budapest, Váci utca 10." />
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div
+          style="
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--muted);
+            margin: 10px 0 10px;
+          "
+        >
+          Tétel
+        </div>
+        <div class="form-grid fg2" style="margin-bottom: 6px">
+          <div class="form-field" style="grid-column: 1/-1">
+            <label for="inv-item-desc">Megnevezés</label>
+            <input type="text" id="inv-item-desc" placeholder="pl. Teljes kezelés" />
+          </div>
+          <div class="form-field">
+            <label for="inv-item-qty">Mennyiség</label>
+            <input type="number" id="inv-item-qty" value="1" min="0.01" step="any" oninput="invUpdatePreview()" />
+          </div>
+          <div class="form-field">
+            <label for="inv-item-unit">Egység</label>
+            <input type="text" id="inv-item-unit" value="alkalom" />
+          </div>
+          <div class="form-field" style="grid-column: 1/-1">
+            <label for="inv-item-price">Egységár (Ft)</label>
+            <input type="text" inputmode="numeric" id="inv-item-price" placeholder="0" oninput="invUpdatePreview()" />
+          </div>
+        </div>
+        <div
+          id="inv-preview-total"
+          style="text-align: right; font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 14px"
+        ></div>
+
+        <div class="divider"></div>
+        <div class="form-field" style="margin-bottom: 14px">
+          <label for="inv-note">Megjegyzés (nem kötelező)</label>
+          <input type="text" id="inv-note" placeholder="pl. Köszönjük a foglalást!" />
+        </div>
+
+        <button class="btn" onclick="invSave()" style="width: 100%">💾 Mentés</button>
+      </div>
+    </div>
+
+    <div class="modal" id="data-modal" onclick="if(event.target===this)closeModal('data-modal')">
+      <div class="modal-card" style="max-width: 440px">
+        <div class="modal-head">
+          <div class="section-title" style="font-size: 18px">Adatok mentése és visszatöltése</div>
+          <button class="btn btn-secondary btn-sm" onclick="closeModal('data-modal')">✕</button>
+        </div>
+        <div class="alert" style="margin-bottom: 16px">
+          Minden adat <b>ebben a böngészőben</b> (localStorage) tárolódik, a bejelentkezett fiókodhoz kötve — nem hagyja
+          el az eszközt. Ezért másik böngészőből vagy eszközről nem érhető el, és a böngészőadatok törlésével elveszhet.
+          Épp ezért a fájlba mentés erősen ajánlott biztonsági másolatnak.
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <button class="btn" onclick="exportData()" style="width: 100%">⬇ Mentés fájlba (JSON)</button>
+          <label
+            class="btn btn-secondary"
+            style="display: block; text-align: center; cursor: pointer; width: 100%; box-sizing: border-box"
+          >
+            ⬆ Visszatöltés fájlból
+            <input
+              type="file"
+              id="import-file"
+              accept=".json,application/json"
+              style="display: none"
+              onchange="importData(this)"
+            />
+          </label>
+          <button class="btn btn-danger" onclick="resetAllData()" style="width: 100%">🗑 Adatok nullázása</button>
+        </div>
+        <p style="color: var(--muted); font-size: 11px; margin-top: 14px; line-height: 1.5">
+          A visszatöltés a jelenlegi adatokat felülírja. A nullázás minden adatot véglegesen töröl ezen az eszközön.
+        </p>
+      </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script>
+      var firebaseConfig = {
+        apiKey: "AIzaSyADv3V5fDtNnHOmG4jHjMehO6kHC_JIr7Q",
+        authDomain: "slotli-202608.firebaseapp.com",
+        projectId: "slotli-202608",
+        storageBucket: "slotli-202608.firebasestorage.app",
+        messagingSenderId: "528948546743",
+        appId: "1:528948546743:web:7ab4296ec29ac92648d132",
+        measurementId: "G-EGSL3MJ0XL",
+      };
+      firebase.initializeApp(firebaseConfig);
+    </script>
+    <script src="js/firebase-store.js?v=20260808"></script>
+    <script src="js/theme.js?v=20260808"></script>
+    <script src="js/script.js?v=20260808"></script>
+    <script src="js/bookings.js?v=20260808"></script>
+    <script src="js/invoices.js?v=20260808"></script>
+    <script src="js/fit-text.js?v=20260808"></script>
+  </body>
+</html>

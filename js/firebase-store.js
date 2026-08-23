@@ -1,0 +1,136 @@
+(function () {
+  var auth = firebase.auth();
+  var db = firebase.firestore();
+  function userObj(u) {
+    return u
+      ? {
+          email: u.email,
+          name: u.displayName || ''
+        }
+      : null;
+  }
+  var LocalStore = {
+    init: function () {
+      return this;
+    },
+    start: function () {},
+    get currentUser() {
+      return userObj(auth.currentUser);
+    },
+    onAuthChange: function (cb) {
+      if (typeof cb !== 'function') return;
+      auth.onAuthStateChanged(function (u) {
+        try {
+          cb(userObj(u));
+        } catch (e) {
+          console.error('[Slotli] auth listener hiba:', e);
+        }
+      });
+    },
+    login: function (email, pass) {
+      return auth.signInWithEmailAndPassword((email || '').trim(), pass);
+    },
+    register: function (email, pass, name) {
+      return auth.createUserWithEmailAndPassword((email || '').trim(), pass).then(function (cred) {
+        if (name)
+          return cred.user.updateProfile({
+            displayName: name
+          });
+      });
+    },
+    logout: function () {
+      return auth.signOut();
+    },
+    resetPassword: function (email) {
+      return auth.sendPasswordResetEmail((email || '').trim());
+    },
+    reauth: function (currentPass) {
+      var u = auth.currentUser;
+      if (!u)
+        return Promise.reject({
+          code: 'no-user'
+        });
+      var cred = firebase.auth.EmailAuthProvider.credential(u.email, currentPass);
+      return u.reauthenticateWithCredential(cred);
+    },
+    updatePassword: function (newPass) {
+      var u = auth.currentUser;
+      if (!u)
+        return Promise.reject({
+          code: 'no-user'
+        });
+      return u.updatePassword(newPass);
+    },
+    updateProfileName: function (name) {
+      var u = auth.currentUser;
+      if (!u) return Promise.resolve();
+      return u.updateProfile({
+        displayName: name || ''
+      });
+    },
+    updateEmail: function (newEmail) {
+      var u = auth.currentUser;
+      if (!u)
+        return Promise.reject({
+          code: 'no-user'
+        });
+      return u.updateEmail((newEmail || '').trim());
+    },
+    uid: function () {
+      return auth.currentUser ? auth.currentUser.uid : '';
+    },
+    loadVault: function () {
+      var u = auth.currentUser;
+      if (!u) return Promise.resolve(null);
+      return db
+        .collection('vaults')
+        .doc(u.uid)
+        .get()
+        .then(function (doc) {
+          return doc.exists ? doc.data() : null;
+        });
+    },
+    saveVault: function (obj) {
+      var u = auth.currentUser;
+      if (!u) return Promise.resolve();
+      var clean;
+      try {
+        clean = JSON.parse(JSON.stringify(obj));
+      } catch (e) {
+        clean = obj;
+      }
+      return db
+        .collection('vaults')
+        .doc(u.uid)
+        .set(clean)
+        .catch(function (e) {
+          console.error('[Slotli] mentés hiba:', e);
+        });
+    },
+    kvGet: function (key, def) {
+      return def;
+    },
+    kvSet: function (key, val) {
+      var u = auth.currentUser;
+      if (!u) return;
+      if (typeof key === 'string' && key.indexOf('config_') === 0) {
+        var clean;
+        try {
+          clean = JSON.parse(JSON.stringify(val));
+        } catch (e) {
+          clean = val;
+        }
+        db.collection('booking_configs')
+          .doc(u.uid)
+          .set(clean)
+          .catch(function (e) {
+            console.warn('[Slotli] booking_config közzététel:', e);
+          });
+      }
+    },
+    kvKey: function (key) {
+      return 'ls_slotli_' + key;
+    }
+  };
+  window.LocalStore = LocalStore;
+})();
