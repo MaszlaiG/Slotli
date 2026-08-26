@@ -2,6 +2,8 @@
 
 **Language / Nyelv:** [English](#english) · [Magyar](#magyar)
 
+**🌐 Live / Élő oldal:** <https://maszlaig.github.io/Slotli/>
+
 **🔗 GitHub:** <!-- Paste the project repository link here, e.g. https://github.com/username/slotli / Illeszd be ide a projekt repójának linkjét --> _(link coming soon / link hamarosan)_
 
 ---
@@ -10,20 +12,21 @@
 
 An account-based application built along the lines of Rendli. It does two things: it **monitors your clients' appointment bookings**, and it **generates an embeddable booking widget** for your website. The visitor picks from fixed time slots, and the booking **reserves the slot immediately** (with collision protection). Data is stored per account in the cloud (**Firebase** — Auth + Cloud Firestore), so bookings sync live.
 
-The interface is fully **bilingual (Hungarian / English)** and uses the shared **"Soft" (Lágy)** design with a collapsible left sidebar (icon + label, collapses to icon).
+The interface is fully **bilingual (Hungarian / English)** and uses the shared **"Soft" (Lágy)** design with a collapsible left sidebar (icon + label, collapses to icon). The layout is **responsive** — phone, tablet and desktop alike — with no horizontal page overflow (wide tables scroll inside their own container) and a sidebar that collapses on small screens.
 
 ### Files
 
 - `index.html` — the UI (auth gate, sidebar, tabs)
-- `style.css` — the shared "Soft" design system + Slotli additions
-- `theme.js` — light / dark / auto appearance (keys: `slotli_theme`, `slotli_mode`)
-- `script.js` — auth, state, booking setup, **widget generator**, overview (incl. the last-12-months revenue chart), i18n
-- `bookings.js` — live incoming-booking sync (Firestore), bookings table, statuses, clients
-- `invoices.js` — invoicing + Account (company details, business/tax form, language)
-- `firebase-store.js` — Firebase Auth + Cloud Firestore data layer (`vaults/<uid>`)
-- `fit-text.js` — auto-fit for large numeric displays
+- `css/style.css` — the shared "Soft" design system + Slotli additions, responsive layout
+- `js/theme.js` — light / dark / auto appearance (keys: `slotli_theme`, `slotli_mode`)
+- `js/script.js` — auth, state, booking setup, **widget generator**, overview (incl. the last-12-months revenue chart), i18n
+- `js/bookings.js` — live incoming-booking sync (Firestore), bookings table, statuses, clients
+- `js/invoices.js` — invoicing + Account (company details, business/tax form, language)
+- `js/firebase-store.js` — Firebase Auth + Cloud Firestore data layer (`vaults/<uid>`)
+- `js/fit-text.js` — auto-fit for large numeric displays
 - `icon.svg` — app icon
-- `README.md`, `firebase.json`, `firestore.rules`, `firestore.indexes.json`
+- `email-sablon.html`, `email-sablon-tulaj.html` — booking-confirmation e-mail templates
+- `README.md`, `DOKUMENTACIO.md`, `firebase.json`, `firestore.rules`, `firestore.indexes.json`
 
 > Script load order: Firebase SDK → `firebase-store.js` → `theme.js` → `script.js` → `bookings.js` → `invoices.js`.
 
@@ -60,20 +63,21 @@ On first use, register an account (email + password). Then go to the **Booking /
 
 A Rendli mintájára készült, fiók-alapú alkalmazás. Két dolgot csinál: **monitorozza az ügyfelek időpontfoglalásait**, és **generál egy beágyazható foglaló-widgetet** a weboldaladra. A látogató fix idősávokból választ, és a foglalás **azonnal lefoglalja** a sávot (ütközésvédelemmel). Az adatok fiókonként a felhőben (**Firebase** — Auth + Cloud Firestore) tárolódnak, így a foglalások élőben szinkronizálódnak.
 
-A felület teljesen **kétnyelvű (magyar / angol)**, a közös **„Lágy"** dizájnt használja, összecsukható bal oldali menüsávval (ikon + felirat, ikonná csukható).
+A felület teljesen **kétnyelvű (magyar / angol)**, a közös **„Lágy"** dizájnt használja, összecsukható bal oldali menüsávval (ikon + felirat, ikonná csukható). Az elrendezés **reszponzív** — telefonon, tableten és asztali gépen egyaránt —, vízszintes túllógás nélkül (a széles táblázatok a saját konténerükben görgethetők), az oldalsáv pedig kis képernyőn összecsukódik.
 
 ### Fájlok
 
 - `index.html` — a felület (auth-kapu, oldalsáv, tabok)
-- `style.css` — a közös „Lágy" megjelenési rendszer + Slotli-kiegészítések
-- `theme.js` — világos / sötét / auto megjelenés (kulcsok: `slotli_theme`, `slotli_mode`)
-- `script.js` — auth, állapot, foglaló-beállító, **widget-generátor**, áttekintés (benne az utolsó 12 hónapos bevétel-diagram), i18n
-- `bookings.js` — élő beérkező-foglalás szinkron (Firestore), foglalás-táblázat, státuszok, ügyfelek
-- `invoices.js` — számlázás + Fiók (cégadatok, vállalkozási forma/adózás, nyelv)
-- `firebase-store.js` — Firebase Auth + Cloud Firestore adatréteg (`vaults/<uid>`)
-- `fit-text.js` — nagy számkijelzők automatikus méretezése
+- `css/style.css` — a közös „Lágy" megjelenési rendszer + Slotli-kiegészítések, reszponzív elrendezés
+- `js/theme.js` — világos / sötét / auto megjelenés (kulcsok: `slotli_theme`, `slotli_mode`)
+- `js/script.js` — auth, állapot, foglaló-beállító, **widget-generátor**, áttekintés (benne az utolsó 12 hónapos bevétel-diagram), i18n
+- `js/bookings.js` — élő beérkező-foglalás szinkron (Firestore), foglalás-táblázat, státuszok, ügyfelek
+- `js/invoices.js` — számlázás + Fiók (cégadatok, vállalkozási forma/adózás, nyelv)
+- `js/firebase-store.js` — Firebase Auth + Cloud Firestore adatréteg (`vaults/<uid>`)
+- `js/fit-text.js` — nagy számkijelzők automatikus méretezése
 - `icon.svg` — az alkalmazás ikonja
-- `README.md`, `firebase.json`, `firestore.rules`, `firestore.indexes.json`
+- `email-sablon.html`, `email-sablon-tulaj.html` — foglalás-visszaigazoló e-mail sablonok
+- `README.md`, `DOKUMENTACIO.md`, `firebase.json`, `firestore.rules`, `firestore.indexes.json`
 
 > Szkript-betöltési sorrend: Firebase SDK → `firebase-store.js` → `theme.js` → `script.js` → `bookings.js` → `invoices.js`.
 
