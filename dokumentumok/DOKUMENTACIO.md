@@ -34,8 +34,7 @@ A UI **kétnyelvű (HU/EN)**, a megjelenés **világos / sötét / auto**, mobil
 ├── bookings.js          # beérkező foglalások (Firestore figyelés), foglalt-sáv kezelés, ügyfelek
 ├── invoices.js          # számlázás + Fiók (cégadatok, adózás, nyelv)
 ├── email-sablon*.html   # EmailJS sablonok
-├── firebase.json / firestore.rules / firestore.indexes.json
-└── slotli-pelda-adatok.json   # példa state (importálható demó adat)
+└── firebase.json / firestore.rules / firestore.indexes.json
 ```
 
 **Szkript-betöltési sorrend:**
@@ -159,7 +158,7 @@ Mobil-first; az oldalsáv hamburgerré csukódik, a rácsok `auto-fit`-tel törn
 ## 8. Beüzemelés
 
 1. Firebase-projekt + konfiguráció (`firestore.rules` telepítés); EmailJS beállítás.
-2. A fájlok feltöltése statikus tárhelyre (Firebase Hosting / GitHub Pages / Netlify / saját szerver).
+2. A fájlok feltöltése GitHubra (GitHub Pages szolgálja ki a weboldalt). A Firebase csak az adattárolás (Auth + Firestore).
 3. Regisztráció → **Foglaló / weboldal** fül: szolgáltatások, nyitvatartás, sávhossz beállítása → **Beállítások mentése** → a generált widget-kód a weboldalra másolása (elég egyszer; a későbbi módosítások a közzétett konfigon át maguktól frissülnek).
 
 Nincs build lépés; fejlesztéshez elég egy statikus fájlkiszolgáló.

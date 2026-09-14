@@ -67,7 +67,9 @@ LÉPÉSEK
    használatában mindegyik látható, ez normális.
 
 6) KÖZZÉTÉTEL
-   firebase deploy   (ld. BEALLITAS-Firebase.txt)
+   A fájlok feltöltése GitHubra (GitHub Pages szolgálja ki a weboldalt).
+   A Firestore-szabály felküldése: cd firebase && firebase deploy --only firestore:rules
+   (ld. BEALLITAS-Firebase.txt)
 
 7) TESZT
    Nyisd meg az élő oldaladat, a beágyazott foglalón foglalj egy
@@ -97,6 +99,6 @@ HIBAELHÁRÍTÁS
 [ ] 3b. Tulaj-template   (email-sablon-tulaj.html) -> templateOwner
 [ ] 4. Public Key
 [ ] 5. EMAILJS_CFG kitöltve a script.js-ben
-[ ] 6. firebase deploy
+[ ] 6. Weboldal fent GitHubon + cd firebase && firebase deploy --only firestore:rules
 [ ] 7. Próba-foglalás -> 2 levél megérkezik
 ======================================================================

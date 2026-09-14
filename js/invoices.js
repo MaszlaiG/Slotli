@@ -648,49 +648,49 @@ function invDownloadPDF(id) {
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@600;700;800&display=swap');
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Inter',-apple-system,'Segoe UI',sans-serif;font-size:13px;color:#10201d;background:#e4f3ef;padding:48px 40px}
+  body{font-family:'Inter',-apple-system,'Segoe UI',sans-serif;font-size:13px;color:#0f1e26;background:#e4f3ef;padding:48px 40px}
   .sheet{max-width:820px;margin:0 auto;background:#ffffff;border:1px solid #cbe5df;border-radius:20px;padding:44px 46px}
   .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:38px}
   .brand{display:flex;align-items:center;gap:11px}
   .brand .tile{width:34px;height:34px;flex:0 0 34px}
-  .logo{font-family:'Nunito',sans-serif;font-size:23px;font-weight:800;color:#10201d}.logo span{color:#0c8579}
+  .logo{font-family:'Nunito',sans-serif;font-size:23px;font-weight:800;color:#0f1e26}.logo span{color:#0b7f8f}
   .inv-meta{text-align:right}
-  .inv-meta h1{font-family:'Nunito',sans-serif;font-size:33px;font-weight:800;letter-spacing:-0.3px;color:#10201d}
-  .inv-meta .num{font-size:12.5px;color:#5c7b75;font-weight:600;margin-top:2px;letter-spacing:.3px}
+  .inv-meta h1{font-family:'Nunito',sans-serif;font-size:33px;font-weight:800;letter-spacing:-0.3px;color:#0f1e26}
+  .inv-meta .num{font-size:12.5px;color:#5a7382;font-weight:600;margin-top:2px;letter-spacing:.3px}
   .parties{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-bottom:30px}
-  .party{border-top:2px solid #0fa79a;padding-top:12px}
-  .plabel{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:#5c7b75;margin-bottom:8px}
+  .party{border-top:2px solid #0e9aac;padding-top:12px}
+  .plabel{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:#5a7382;margin-bottom:8px}
   .pname{font-size:15px;font-weight:700;margin-bottom:3px}
-  .pinfo{font-size:12px;color:#5c7b75;line-height:1.65}
+  .pinfo{font-size:12px;color:#5a7382;line-height:1.65}
   .dates{display:flex;gap:32px;flex-wrap:wrap;padding:14px 0;border-top:1px solid #cbe5df;border-bottom:1px solid #cbe5df;margin-bottom:26px}
-  .dlabel{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#5c7b75;margin-bottom:3px}
+  .dlabel{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#5a7382;margin-bottom:3px}
   .dval{font-size:13.5px;font-weight:700}
   table{width:100%;border-collapse:collapse;margin-bottom:6px}
-  thead th{border-bottom:2px solid #10201d;padding:9px 10px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#5c7b75;text-align:left}
-  tbody td{padding:12px 10px;border-bottom:1px solid #e0efeb;font-size:13px}
+  thead th{border-bottom:2px solid #0f1e26;padding:9px 10px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#5a7382;text-align:left}
+  tbody td{padding:12px 10px;border-bottom:1px solid #e0edf2;font-size:13px}
   .totals{display:flex;justify-content:flex-end;margin-top:24px}
   .totals .box{min-width:320px}
   .trow{display:flex;justify-content:space-between;padding:7px 2px;font-size:13px;color:#33544d}
   .trow.sep{border-top:1px solid #cbe5df}
-  .tfinal{display:flex;justify-content:space-between;align-items:center;margin-top:10px;background:#0fa79a;color:#fff;padding:15px 20px;border-radius:14px}
+  .tfinal{display:flex;justify-content:space-between;align-items:center;margin-top:10px;background:#0e9aac;color:#fff;padding:15px 20px;border-radius:14px}
   .tfinal .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;opacity:.94}
   .tfinal .amt{font-family:'Nunito',sans-serif;font-size:27px;font-weight:800;letter-spacing:-0.3px}
-  .aam{margin-top:10px;text-align:right;font-size:11.5px;color:#5c7b75;font-style:italic}
+  .aam{margin-top:10px;text-align:right;font-size:11.5px;color:#5a7382;font-style:italic}
   .pay{text-align:right;margin-top:16px;font-size:12px;color:#33544d}
-  .note{border-left:3px solid #0fa79a;background:#e6f4f1;border-radius:0 12px 12px 0;padding:11px 15px;font-size:12px;color:#0c5a52;margin-top:22px}
-  .footer{border-top:1px solid #cbe5df;margin-top:30px;padding-top:14px;font-size:11px;color:#5c7b75;text-align:center}
-  .print-btn{margin-top:16px;background:#0fa79a;color:#fff;border:none;border-radius:999px;padding:11px 26px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif}
+  .note{border-left:3px solid #0e9aac;background:#e9f2f6;border-radius:0 12px 12px 0;padding:11px 15px;font-size:12px;color:#0b5560;margin-top:22px}
+  .footer{border-top:1px solid #cbe5df;margin-top:30px;padding-top:14px;font-size:11px;color:#5a7382;text-align:center}
+  .print-btn{margin-top:16px;background:#0e9aac;color:#fff;border:none;border-radius:999px;padding:11px 26px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif}
   @media print{.print-btn{display:none}body{background:#fff;padding:0}.sheet{border:none;border-radius:0;padding:22px 24px;max-width:none}}
 </style></head><body>
 <div class="sheet">
   <div class="top">
     <div class="brand">
       <svg class="tile" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-        <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0fa79a"/><stop offset="1" stop-color="#0c8579"/></linearGradient></defs>
+        <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0e9aac"/><stop offset="1" stop-color="#0b7f8f"/></linearGradient></defs>
         <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#bg)"/>
         <rect x="14" y="14" width="36" height="36" rx="7" fill="#ffffff"/>
-        <rect x="14" y="14" width="36" height="10" rx="5" fill="#0c8579"/>
-        <rect x="21" y="30" width="8" height="8" rx="2" fill="#ff8a6b"/>
+        <rect x="14" y="14" width="36" height="10" rx="5" fill="#0b7f8f"/>
+        <rect x="21" y="30" width="8" height="8" rx="2" fill="#12aec4"/>
         <rect x="35" y="30" width="8" height="8" rx="2" fill="#bfe8e2"/>
       </svg>
       <div class="logo">Slot<span>li</span></div>
@@ -714,7 +714,7 @@ function invDownloadPDF(id) {
     <tbody>${itemRows}</tbody>
   </table>
   <div class="totals"><div class="box">${totalsHtml}</div></div>
-  ${inv.sellerBank ? `<div class="pay">Fizetés átutalással · Bankszámlaszám: <strong style="color:#10201d">${esc(inv.sellerBank)}</strong></div>` : ''}
+  ${inv.sellerBank ? `<div class="pay">Fizetés átutalással · Bankszámlaszám: <strong style="color:#0f1e26">${esc(inv.sellerBank)}</strong></div>` : ''}
   ${inv.note ? `<div class="note">📝 ${esc(inv.note)}</div>` : ''}
   <div class="footer">${esc(inv.invoiceNum)} · Kiállítva: ${inv.issueDate || '—'} · Slotli<br>
   <button class="print-btn" onclick="window.print()">Nyomtatás / Mentés PDF-ként</button></div>

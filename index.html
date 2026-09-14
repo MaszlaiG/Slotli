@@ -4,7 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Slotli</title>
-    <link rel="icon" type="image/svg+xml" href="icon.svg" />
+    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="img/favicon-48.png" />
+    <link rel="apple-touch-icon" href="img/favicon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -36,6 +39,40 @@
     <link rel="stylesheet" href="css/style.css?v=20260808" />
   </head>
   <body>
+    <div class="sl-intro" id="sl-intro" aria-hidden="true">
+      <div class="sl-intro__inner">
+        <img class="sl-intro__mark" src="img/logo-mark.png" alt="Slotli" width="120" height="120" />
+        <div class="sl-intro__word">Slotli</div>
+        <div class="sl-intro__tag">Egyszerű időpont-foglalás</div>
+        <div class="sl-intro__bar" aria-hidden="true"><span></span></div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var intro = document.getElementById("sl-intro");
+        if (!intro) return;
+        var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var seen = false;
+        try {
+          seen = !!sessionStorage.getItem("slotli-intro");
+        } catch (e) {}
+        if (seen || reduce) {
+          if (intro.parentNode) intro.parentNode.removeChild(intro);
+          return;
+        }
+        try {
+          sessionStorage.setItem("slotli-intro", "1");
+        } catch (e) {}
+        document.body.classList.add("sl-intro-lock");
+        setTimeout(function () {
+          intro.classList.add("is-leaving");
+          document.body.classList.remove("sl-intro-lock");
+          setTimeout(function () {
+            if (intro.parentNode) intro.parentNode.removeChild(intro);
+          }, 600);
+        }, 2400);
+      })();
+    </script>
     <div
       id="auth-gate"
       style="
@@ -62,7 +99,7 @@
         "
       >
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px">
-          <img src="icon.svg" width="38" height="38" alt="" />
+          <img src="img/logo-mark.png" width="38" height="38" alt="Slotli" style="object-fit: contain" />
           <span style="font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: -0.01em"
             >Slotli</span
           >
@@ -144,21 +181,8 @@
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-head">
           <div class="brand-lockup">
-            <span class="brand-tile">
-              <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="sl-g" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0" stop-color="var(--brand-1)" />
-                    <stop offset="1" stop-color="var(--brand-2)" />
-                  </linearGradient>
-                </defs>
-                <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#sl-g)" />
-                <rect x="14" y="16" width="36" height="34" rx="5" fill="#ffffff" />
-                <rect x="22" y="12" width="4" height="8" rx="2" fill="#ffffff" />
-                <rect x="38" y="12" width="4" height="8" rx="2" fill="#ffffff" />
-                <rect x="20" y="31" width="24" height="5" rx="2.5" fill="var(--brand-accent)" />
-                <rect x="20" y="40" width="15" height="5" rx="2.5" fill="var(--brand-1)" opacity="0.30" />
-              </svg>
+            <span class="brand-tile has-logo" aria-hidden="true">
+              <img src="img/logo-mark.png" alt="Slotli" width="34" height="34" />
             </span>
             <span class="brand-word">Slot<span>li</span></span>
           </div>

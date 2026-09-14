@@ -10,7 +10,7 @@
       id: 'kompakt',
       name: 'Lágy',
       desc: 'Kerek, barátságos, levegős.',
-      sw: ['#0fa79a', '#f0faf8', '#ff8a6b']
+      sw: ['#0e9aac', '#f0faf8', '#12aec4']
     }
   ];
   function themeExists(id) {

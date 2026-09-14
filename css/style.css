@@ -13,30 +13,30 @@
   --display: "Nunito", "Inter", -apple-system, "Segoe UI", sans-serif;
   --ui: "Inter", -apple-system, "Segoe UI", sans-serif;
 
-  --brand-1: #0fa79a;
-  --brand-2: #0c8579;
-  --brand-accent: #ff8a6b;
+  --brand-1: #17b3b0;
+  --brand-2: #1670c4;
+  --brand-accent: #12aec4;
 
-  --focus: rgba(15, 167, 154, 0.26);
+  --focus: rgba(14, 154, 172, 0.26);
 }
 
 html[data-theme="kompakt"] {
-  --bg: #e4f3ef;
-  --surface: #f5fbf9;
-  --surface2: #e6f4f1;
-  --surface3: #d6ece7;
-  --border: #cbe5df;
-  --border2: #a5d4cb;
-  --text: #10201d;
-  --muted: #5c7b75;
-  --primary: #0fa79a;
-  --primary-strong: #0c8579;
+  --bg: #e8f2f6;
+  --surface: #f6fafc;
+  --surface2: #e9f2f6;
+  --surface3: #d9e8ef;
+  --border: #cfe2ea;
+  --border2: #a9cbdb;
+  --text: #0f1e26;
+  --muted: #5a7382;
+  --primary: #0e9aac;
+  --primary-strong: #0b7f8f;
   --on-primary: #ffffff;
-  --accent: #0fa79a;
-  --accent2: #ff8a6b;
-  --accent3: #0c9c8f;
+  --accent: #0e9aac;
+  --accent2: #1670c4;
+  --accent3: #0e93a3;
   --red: #e0644a;
-  --purple: #4f8f86;
+  --purple: #4f7f92;
   --shadow: 0 1px 2px rgba(10, 50, 45, 0.07), 0 3px 10px rgba(10, 50, 45, 0.05);
   --radius-card: 20px;
   --radius-ctl: 14px;
@@ -48,33 +48,33 @@ html[data-theme="kompakt"] {
   --ui: "Inter", -apple-system, "Segoe UI", sans-serif;
   --display: "Nunito", "Inter", -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", monospace;
-  --brand-1: #0fa79a;
-  --brand-2: #0c8579;
-  --brand-accent: #ff8a6b;
-  --focus: rgba(15, 167, 154, 0.26);
+  --brand-1: #17b3b0;
+  --brand-2: #1670c4;
+  --brand-accent: #12aec4;
+  --focus: rgba(14, 154, 172, 0.26);
 }
 html[data-theme="kompakt"][data-mode="dark"] {
-  --bg: #0b1a17;
-  --surface: #12241f;
-  --surface2: #17302a;
-  --surface3: #1f3e36;
-  --border: #244039;
-  --border2: #33574d;
-  --text: #e4f3ee;
-  --muted: #8cb4ac;
-  --primary: #3fc7b4;
-  --primary-strong: #5fd8c6;
+  --bg: #0b1620;
+  --surface: #12202a;
+  --surface2: #172a36;
+  --surface3: #203744;
+  --border: #24394a;
+  --border2: #33506a;
+  --text: #e4eff5;
+  --muted: #8aa6b6;
+  --primary: #35c7c9;
+  --primary-strong: #5fd8da;
   --on-primary: #052019;
-  --accent: #3fc7b4;
-  --accent2: #ff9e7d;
-  --accent3: #4fd3c0;
+  --accent: #35c7c9;
+  --accent2: #57a6ea;
+  --accent3: #4fd0d6;
   --red: #e88a6f;
-  --purple: #7fb8ae;
+  --purple: #7fb0c8;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.42), 0 3px 12px rgba(0, 0, 0, 0.35);
-  --brand-1: #3fc7b4;
-  --brand-2: #5fd8c6;
-  --brand-accent: #ff9e7d;
-  --focus: rgba(63, 199, 180, 0.32);
+  --brand-1: #35c7c9;
+  --brand-2: #57a6ea;
+  --brand-accent: #4fd0dc;
+  --focus: rgba(53, 199, 201, 0.32);
 }
 
 :root,
@@ -387,16 +387,19 @@ body.sidebar-collapsed #main-nav button.active {
   height: 100%;
   display: block;
 }
+.brand-tile.has-logo {
+  border-radius: 0;
+  overflow: visible;
+  box-shadow: none;
+  background: transparent;
+}
+.brand-tile.has-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
 
-.rendli-mark .bs0 {
-  stop-color: var(--brand-1);
-}
-.rendli-mark .bs1 {
-  stop-color: var(--brand-2);
-}
-.rendli-mark .bar-accent {
-  fill: var(--brand-accent);
-}
 .brand-word {
   font-family: var(--display);
   font-size: 20px;
@@ -1859,4 +1862,112 @@ html[data-mode="dark"] .seg button.selected {
   .sl-hwin input[type="time"] {
     width: 42%;
   }
+}
+
+.sl-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  overflow: hidden;
+}
+.sl-intro::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(58% 52% at 50% 42%, color-mix(in srgb, var(--primary) 22%, transparent), transparent 70%),
+    radial-gradient(48% 44% at 50% 60%, color-mix(in srgb, var(--accent2) 16%, transparent), transparent 72%);
+}
+.sl-intro__inner {
+  position: relative;
+  text-align: center;
+  padding: 24px;
+  opacity: 0;
+  animation: slPop 0.7s cubic-bezier(0.2, 1.35, 0.35, 1) 0.05s forwards;
+}
+@keyframes slPop {
+  0% { opacity: 0; transform: scale(0.9); }
+  55% { opacity: 1; }
+  100% { opacity: 1; transform: scale(1); }
+}
+.sl-intro__mark {
+  width: min(36vw, 120px);
+  height: auto;
+  display: block;
+  margin: 0 auto 18px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 26px color-mix(in srgb, var(--brand-2) 34%, transparent));
+  animation: slFloat 3.4s ease-in-out 0.8s infinite;
+}
+@keyframes slFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.sl-intro__word {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(34px, 9vw, 56px);
+  letter-spacing: -0.01em;
+  line-height: 1;
+  background: linear-gradient(95deg, var(--brand-1), var(--brand-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: slReveal 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) 0.55s forwards;
+}
+.sl-intro__tag {
+  font-family: var(--ui);
+  font-size: clamp(10px, 2.6vw, 13px);
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 14px;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: slReveal 0.8s ease 0.95s forwards;
+}
+@keyframes slReveal {
+  to { opacity: 1; transform: none; }
+}
+.sl-intro__bar {
+  width: min(60vw, 220px);
+  height: 3px;
+  margin: 30px auto 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--muted) 22%, transparent);
+  overflow: hidden;
+  opacity: 0;
+  animation: slReveal 0.5s ease 0.85s forwards;
+}
+.sl-intro__bar span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--brand-1), var(--brand-2));
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation: slBar 2.25s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards;
+}
+@keyframes slBar {
+  to { transform: scaleX(1); }
+}
+.sl-intro.is-leaving {
+  animation: slOut 0.6s cubic-bezier(0.6, 0, 0.3, 1) forwards;
+}
+@keyframes slOut {
+  0% { opacity: 1; filter: blur(0); transform: scale(1); }
+  100% { opacity: 0; filter: blur(10px); transform: scale(1.08); visibility: hidden; }
+}
+body.sl-intro-lock {
+  overflow: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sl-intro { display: none; }
 }

@@ -1,6 +1,7 @@
 ======================================================================
- SLOTLI — FIREBASE BEÁLLÍTÁS (Authentication + Firestore + Hosting)
+ SLOTLI — FIREBASE BEÁLLÍTÁS (Authentication + Firestore)
  Projekt: slotli-202608
+ (A weboldalt GitHub-ra töltjük fel — a Firebase csak az adattárolás.)
 ======================================================================
 
 MI EZ AZ APP?
@@ -11,11 +12,14 @@ MI EZ AZ APP?
   a Slotli-fiókodban. A foglalt idősávok is a felhőben vannak, így
   KÉT ember nem foglalhatja ugyanazt (ütközésvédelem).
 
-  Három Firebase-szolgáltatás kell:
+  Két Firebase-szolgáltatás kell:
     - Authentication → a tulaj bejelentkezése (e-mail/jelszó).
     - Firestore     → a tulaj adata + a beérkező foglalások + a foglalt
                       idősávok + a foglaló-konfig.
-    - Hosting       → a Slotli weboldal kiszolgálása (HTTPS-sel).
+
+  A Slotli weboldalt (és a beágyazható foglaló-widgetet) NEM a Firebase
+  Hosting szolgálja ki, hanem GitHub (GitHub Pages). A Firebase itt csak
+  adattárolás (Auth + Firestore).
 
 
 ----------------------------------------------------------------------
@@ -56,7 +60,7 @@ LÉPÉSEK:
 ----------------------------------------------------------------------
 4) A DEPLOY-FÁJLOK (már a mappában vannak)
 ----------------------------------------------------------------------
-  firebase.json          → Hosting + Firestore beállítás.
+  firebase.json          → Firestore beállítás (szabály + index fájl).
   .firebaserc            → a projekt: slotli-202608.
   firestore.rules        → biztonsági szabályok (ld. 5. pont).
   firestore.indexes.json → (üres) index-fájl.
@@ -95,26 +99,28 @@ Négy rész:
          allow read, delete: if request.auth != null && request.auth.uid == uid;
        }
 
-A "firebase deploy" a szabályt automatikusan felteszi.
+A "cd firebase && firebase deploy --only firestore:rules" a szabályt automatikusan felteszi.
 
 
 ----------------------------------------------------------------------
-6) DEPLOY (feltöltés)
+6) A FIRESTORE-SZABÁLY FELTÖLTÉSE
 ----------------------------------------------------------------------
-A Slotli mappájában:
+A Slotli mappájában (a weboldal GitHubon van, ide csak a Firestore-szabály
+kerül fel):
 
     cd "<a Slotli mappa útvonala>"
-    firebase deploy
+    cd firebase && firebase deploy --only firestore:rules
 
-  Felteszi a HOSTINGOT + a FIRESTORE-SZABÁLYT.
-  URL:  https://slotli-202608.web.app
-  Minden módosítás után futtasd újra. (--only hosting / --only firestore:rules)
+  Felteszi a FIRESTORE-SZABÁLYT. Minden szabálymódosítás után futtasd újra.
 
 
 ----------------------------------------------------------------------
-7) DEPLOY UTÁN — FONTOS (a beágyazott widgethez)
+7) KÖZZÉTÉTEL UTÁN — FONTOS (a beágyazott widgethez)
 ----------------------------------------------------------------------
-1. Nyisd meg az élő Slotlit (slotli-202608.web.app) → REGISZTRÁLJ /
+0. A statikus fájlokat töltsd fel a GitHub repóba, és a GitHub Pages
+   szolgálja ki (Settings → Pages). A GitHub Pages domainjét vedd fel:
+   Authentication → Settings → Authorized domains (különben nincs login).
+1. Nyisd meg az élő Slotlit → REGISZTRÁLJ /
    jelentkezz be → a "Foglaló / weboldal" fülön állítsd be a
    szolgáltatásokat, nyitvatartást, sávhosszt és MENTS. Ekkor kerül fel a
    foglaló-konfig a Firestore-ba (booking_configs), hogy a widget lássa.
@@ -129,7 +135,8 @@ A Slotli mappájában:
 ----------------------------------------------------------------------
 8) (OPCIONÁLIS) EGYEDI DOMAIN
 ----------------------------------------------------------------------
-Console → Build → Hosting → "Add custom domain" (pl. slotli.hu) → DNS.
+Egyedi domain a GitHub Pages-nél (repo → Settings → Pages → Custom domain)
++ DNS a domainszolgáltatónál.
 Utána: Authentication → Settings → Authorized domains közé is felvenni.
 
 
@@ -149,7 +156,7 @@ oldalra teszed, praktikus.
 ----------------------------------------------------------------------
 10) BIZTONSÁG DIÓHÉJBAN
 ----------------------------------------------------------------------
-- HTTPS: automatikus (Hosting).
+- HTTPS: automatikus (GitHub Pages).
 - Auth + Rules: a tulaj adata uid-re zárva; a nyilvános írás csak "create"
   + méretkorlát; a foglalt sávok ütközésvédve.
 - apiKey: publikus azonosító, nem titok.
@@ -163,7 +170,9 @@ oldalra teszed, praktikus.
 [ ] 1. Firebase CLI + firebase login
 [ ] 2. Authentication → Email/Password: Enabled
 [ ] 3. Firestore Database létrehozva (europe-west, Production)
-[ ] 6. firebase deploy → slotli-202608.web.app él
+[ ] 5. cd firebase && firebase deploy --only firestore:rules → a szabály felkerült
+[ ] 6. A weboldal fent van GitHubon (GitHub Pages) + a domain az
+       Authorized domains közt
 [ ] 7. Bejelentkezés + Foglaló beállítása/mentése (konfig felkerül) + kód
 [ ] 7. Próbafoglalás → megjelenik a Foglalásoknál; ütközés-teszt OK
 [ ] 8/9. (Opcionális) egyedi domain / App Check
