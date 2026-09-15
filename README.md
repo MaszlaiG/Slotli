@@ -1,4 +1,4 @@
-# MaszlaG — Mászlai Gábor
+# Slotli
 
 **Language / Nyelv:** [English](#english) · [Magyar](#magyar)
 
@@ -8,40 +8,40 @@
 
 ## English
 
-**🌐 Live site:** <https://maszlaig.github.io/MaszlaG/>
+**🌐 Live site:** <https://maszlaig.github.io/Slotli/>
 
-The portfolio website of web developer **Gábor Mászlai** (Hajdúszoboszló) — with a construction background. A one-page, view-based **static** site: services, selected work, prices and contact. Fully **bilingual (HU/EN)**, mobile-first responsive, no build step and no framework.
+**Slotli** is an account-based **appointment-booking manager** for service providers — bookings, clients and invoices in one place, plus an **embeddable booking widget** whose submissions appear automatically. Data is stored per account in **Firebase** (Auth + Firestore). No build step, no framework: plain HTML/CSS/JS. Bilingual (HU/EN), light/dark "Studio" design with a blue-teal accent.
 
 **Highlights**
-- **"Concrete → websites" narrative** — a warm, crafted identity (cream + clay + sage) with Fraunces (serif) + Inter + JetBrains Mono.
-- **`<MG/>` intro splash** — an animated logo that draws itself, then dissolves (once per session, respects `prefers-reduced-motion`).
-- **Selected projects** — a work gallery with per-project case studies and light/dark screenshots.
-- **Embedded order form** — a live **Kvitli** order form in the contact section; submissions flow straight into the Kvitli account.
-- **Bilingual + SEO** — HU/EN toggle, Open Graph / Twitter cards and JSON-LD structured data.
+- **Embeddable booking widget** — paste it onto your own site; the offered slots are computed from your services, opening hours and slot length, with collision protection.
+- **Live inbox** — submitted bookings pull straight into the account (`onSnapshot`) with statuses; a cancellation frees the slot again.
+- **Confirmation e-mails** — automatic client + provider notifications via **EmailJS**.
+- **Invoicing** — issue and print invoices as **PDF**.
+- **Overview** — a dashboard with a last-12-months revenue chart, clients and upcoming bookings.
 
-**Tech:** vanilla HTML/CSS/JS · embedded **Kvitli** order form (Firebase) · EmailJS (order confirmations) · no build step.
+**Tech:** vanilla HTML/CSS/JS · Firebase (Auth + Firestore) · EmailJS · custom canvas charts · no build step.
 
-**Structure:** `index.html` · `css/` · `js/` · `kepek/` (images) · `dokumentumok/` (design doc PDF, HU + EN).
+**Structure:** `index.html` · `css/` · `js/` (`script.js`, `bookings.js`, `invoices.js`, `theme.js`, `firebase-store.js`, `fit-text.js`) · `img/` (logó, favicon) · `email-sablonok/` · `firebase/` · `dokumentumok/` (design doc PDF, HU + EN).
 
-**Deploy:** Git + GitHub Pages (or any static host). Full details: the **design document PDF** in `dokumentumok/`.
+**Deploy:** static hosting (GitHub Pages); Firestore rules from the `firebase/` folder (`cd firebase && firebase deploy --only firestore:rules`). Full details: the **design document PDF** in `dokumentumok/`.
 
 ---
 
 ## Magyar
 
-**🌐 Élő oldal:** <https://maszlaig.github.io/MaszlaG/>
+**🌐 Élő oldal:** <https://maszlaig.github.io/Slotli/>
 
-Mászlai Gábor webfejlesztő (Hajdúszoboszló) portfólió-oldala — építőipari háttérrel. Egyoldalas, nézetekre bontott, **statikus** oldal: szolgáltatások, kiválasztott munkák, árak és kapcsolat. Teljesen **kétnyelvű (HU/EN)**, mobil-first reszponzív, build lépés és keretrendszer nélkül.
+A **Slotli** fiók-alapú **időpontfoglalás-kezelő** szolgáltatóknak — foglalások, ügyfelek és számlák egy helyen, plusz egy **beágyazható foglaló-widget**, amelynek foglalásai automatikusan megjelennek. Az adat fiókonként a **Firebase**-ben (Auth + Firestore). Nincs build lépés, nincs keretrendszer: tiszta HTML/CSS/JS. Kétnyelvű (HU/EN), világos/sötét „Stúdió" dizájn kék-teal akcentussal.
 
 **Kiemelt funkciók**
-- **„Beton → weboldal" narratíva** — meleg, kézműves arculat (krém + agyag + zsálya), Fraunces (serif) + Inter + JetBrains Mono betűkkel.
-- **`<MG/>` nyitó-splash** — animált logó, amely kirajzolódik, majd átúszik (munkamenetenként egyszer, tiszteli a `prefers-reduced-motion` beállítást).
-- **Kiválasztott projektek** — munka-galéria projektenkénti esettanulmányokkal, világos/sötét képernyőképekkel.
-- **Beágyazott megrendelő-űrlap** — élő **Kvitli** rendelőűrlap a kapcsolat szekcióban; a rendelés közvetlenül a Kvitli-fiókba fut be.
-- **Kétnyelvűség + SEO** — HU/EN váltó, Open Graph / Twitter kártyák és JSON-LD strukturált adatok.
+- **Beágyazható foglaló-widget** — a saját weboldaladra illeszthető; a felkínált idősávokat a szolgáltatásaidból, a nyitvatartásból és a sávhosszból számolja, ütközésvédelemmel.
+- **Élő beérkező lista** — a leadott foglalások élőben behúzódnak a fiókba (`onSnapshot`), státuszokkal; egy lemondás visszaszabadítja a sávot.
+- **Visszaigazoló e-mailek** — automatikus ügyfél + szolgáltató értesítés **EmailJS**-en.
+- **Számlázás** — számlák kiállítása és nyomtatása **PDF**-ként.
+- **Áttekintés** — irányítópult az utolsó 12 hónap bevétel-diagramjával, ügyfelekkel és közelgő foglalásokkal.
 
-**Technológia:** vanilla HTML/CSS/JS · beágyazott **Kvitli** rendelőűrlap (Firebase) · EmailJS (rendelés-visszaigazolás) · build lépés nélkül.
+**Technológia:** vanilla HTML/CSS/JS · Firebase (Auth + Firestore) · EmailJS · egyedi canvas diagramok · build lépés nélkül.
 
-**Szerkezet:** `index.html` · `css/` · `js/` · `kepek/` (képek) · `dokumentumok/` (tervdokumentáció PDF, HU + EN).
+**Szerkezet:** `index.html` · `css/` · `js/` (`script.js`, `bookings.js`, `invoices.js`, `theme.js`, `firebase-store.js`, `fit-text.js`) · `img/` (logó, favicon) · `email-sablonok/` · `firebase/` · `dokumentumok/` (tervdokumentáció PDF, HU + EN).
 
-**Közzététel:** Git + GitHub Pages (vagy bármely statikus tárhely). Teljes leírás: a **tervdokumentáció PDF** a `dokumentumok/` mappában.
+**Közzététel:** statikus tárhely (GitHub Pages); a Firestore-szabály a `firebase/` mappából (`cd firebase && firebase deploy --only firestore:rules`). Teljes leírás: a **tervdokumentáció PDF** a `dokumentumok/` mappában.
