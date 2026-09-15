@@ -8,6 +8,8 @@
 
 ## English
 
+**🌐 Live site:** <https://maszlaig.github.io/Slotli/>
+
 **Slotli** is an account-based **appointment-booking manager** for service providers — bookings, clients and invoices in one place, plus an **embeddable booking widget** whose submissions appear automatically. Data is stored per account in **Firebase** (Auth + Firestore). No build step, no framework: plain HTML/CSS/JS. Bilingual (HU/EN), light/dark "Studio" design with a blue-teal accent.
 
 **Highlights**
@@ -26,6 +28,8 @@
 ---
 
 ## Magyar
+
+**🌐 Élő oldal:** <https://maszlaig.github.io/Slotli/>
 
 A **Slotli** fiók-alapú **időpontfoglalás-kezelő** szolgáltatóknak — foglalások, ügyfelek és számlák egy helyen, plusz egy **beágyazható foglaló-widget**, amelynek foglalásai automatikusan megjelennek. Az adat fiókonként a **Firebase**-ben (Auth + Firestore). Nincs build lépés, nincs keretrendszer: tiszta HTML/CSS/JS. Kétnyelvű (HU/EN), világos/sötét „Stúdió" dizájn kék-teal akcentussal.
 
